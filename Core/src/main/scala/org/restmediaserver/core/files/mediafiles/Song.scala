@@ -77,12 +77,46 @@ object Song {
   private val SecondsInMinute = 60
 
   def apply(path: File): Option[Song] = {
+
+    def hasArtwork()(implicit tag: Tag): Boolean = {
+      tag.getFirstArtwork match {
+        case null => false
+        case _ => true
+      }
+    }
+
+    def isCompilation()(implicit tag: Tag): Boolean = {
+      val falseStrings = Set("false", "f", "0") // lower case values that could mean false
+      tagFieldAsString(FieldKey.IS_COMPILATION) match {
+        case Some(str) => if (str.trim.length > 0 && !falseStrings.contains(str.toLowerCase)) true else false
+        case None => false
+      }
+    }
+
+    def tagFieldAsInt(key: FieldKey)(implicit tag: Tag): Option[Int] = {
+      try {
+        // TODO potentially frequent exceptions from tag.getFirst, investigate
+        val str = tag.getFirst(key)
+        Option(str.toInt)
+      } catch {
+        case e: Exception => None
+      }
+    }
+
+    def tagFieldAsString(key: FieldKey)(implicit tag: Tag): Option[String] = {
+      try {
+        // TODO potentially frequent exceptions from tag.getFirst, investigate
+        Option(tag.getFirst(key))
+      } catch {
+        case e: Exception => None
+      }
+    }
     getFileType(path) match {
       case None => None
-      case Some(fileType) => {
+      case Some(fileType) =>
         val audioFile = AudioFileIO.read(path)
         val header = audioFile.getAudioHeader
-        val tag = audioFile.getTagOrCreateAndSetDefault
+        implicit val tag = audioFile.getTagOrCreateAndSetDefault
         Option(new Song(path,
           fileType,
           header.getBitRateAsNumber,
@@ -117,41 +151,6 @@ object Song {
           Option(isCompilation()),
           hasArtwork()
         ))
-
-        def tagFieldAsInt(key: FieldKey): Option[Int] = {
-          try {
-            // TODO potentially frequent exceptions from tag.getFirst, investigate
-            val str = tag.getFirst(key)
-            Option(str.toInt)
-          } catch {
-            case e: Exception => None
-          }
-        }
-
-        def tagFieldAsString(key: FieldKey): Option[String] = {
-          try {
-            // TODO potentially frequent exceptions from tag.getFirst, investigate
-            Option(tag.getFirst(key))
-          } catch {
-            case e: Exception => None
-          }
-        }
-
-        def hasArtwork(): Boolean = {
-          tag.getFirstArtwork match {
-            case null => false
-            case _ => true
-          }
-        }
-
-        def isCompilation(): Boolean = {
-          val falseStrings = Set("false", "f", "0") // lower case values that could mean false
-          tagFieldAsString(FieldKey.IS_COMPILATION) match {
-            case Some(str) => if (str.trim.length > 0 && !falseStrings.contains(str.toLowerCase)) true else false
-            case None => false
-          }
-        }
-      }
     }
 
   }
@@ -161,7 +160,13 @@ object Song {
     def getFileType(path: File): Option[FileType] ={
       try{
         val fileName = path.getName
-        val extension = fileName.substring(fileName lastIndexOf '.', fileName.length).toLowerCase
+        val length = fileName.length
+        val extensionStart = fileName lastIndexOf '.' match {
+          case x if x == length => fileName.length
+          case -1 => 0
+          case x => x + 1 //skip dot
+        }
+        val extension = fileName.substring( extensionStart, fileName.length).toLowerCase
         Option(FileType.withName(extension))
       }
       catch {
