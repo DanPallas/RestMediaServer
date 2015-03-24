@@ -3,7 +3,8 @@ lazy val commonSettings = Seq(
   version := "0.0.1-SNAPSHOT",
   scalaVersion := "2.11.5",
   libraryDependencies += "commons-io" % "commons-io" % "2.4",
-  libraryDependencies += "org" % "jaudiotagger" % "2.0.3"
+  libraryDependencies += "org" % "jaudiotagger" % "2.0.3",
+  libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.4" % "test"
 )
 
 lazy val RestMediaServer = (project in file(".")).
