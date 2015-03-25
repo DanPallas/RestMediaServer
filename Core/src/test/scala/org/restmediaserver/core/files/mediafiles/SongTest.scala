@@ -5,7 +5,9 @@ import java.io.File
 import org.scalatest.{FunSuite,Matchers}
 
 /**
- * Created by Dan Pallas on 3/23/15.
+ * Test Song Class
+ * @author Dan Pallas
+ * @since  version 1.0 on 3/23/15.
  */
 class SongTest extends FunSuite with Matchers {
   test("Song.apply should read in an mp3 and return a Song"){
@@ -22,6 +24,7 @@ class SongTest extends FunSuite with Matchers {
 
   //todo test for wrong extension
   //todo test that tags are successfully read
+  //todo test for no-extension file
 
 }
 

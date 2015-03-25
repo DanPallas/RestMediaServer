@@ -5,7 +5,6 @@ import java.io.File
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.tag.datatype.Artwork
 import org.jaudiotagger.tag.{FieldKey, Tag}
-import org.restmediaserver.core.files.mediafiles.MediaFile.FileType
 import org.restmediaserver.core.files.mediafiles.MediaFile.FileType.FileType
 
 import scala.collection.JavaConverters._
@@ -14,8 +13,8 @@ import scala.collection.JavaConverters._
  * updated then it should change for all references.
  * Created by Dan Pallas on 3/19/15.
  */
-class Song(path: File,
-                   fileType: FileType,
+case class Song(override val path: File,
+           override val fileType: FileType,
                    bitRate: Long,
                    channels: String,
                    encodingType: String,
@@ -47,7 +46,7 @@ class Song(path: File,
                    albumArtist: Option[String],
                    isCompilation: Option[Boolean],
                    hasArtwork: Boolean
-            ) extends MediaFile(path, fileType) {
+            ) extends MediaFile {
 
   def trackLengthPrettyString: String = {
     val minutes = trackLength / Song.SecondsInMinute
@@ -70,48 +69,13 @@ class Song(path: File,
       Option(tag.getFirstArtwork)
     } else None
   }
-
 }
 
 object Song {
   private val SecondsInMinute = 60
 
   def apply(path: File): Option[Song] = {
-
-    def hasArtwork()(implicit tag: Tag): Boolean = {
-      tag.getFirstArtwork match {
-        case null => false
-        case _ => true
-      }
-    }
-
-    def isCompilation()(implicit tag: Tag): Boolean = {
-      val falseStrings = Set("false", "f", "0") // lower case values that could mean false
-      tagFieldAsString(FieldKey.IS_COMPILATION) match {
-        case Some(str) => if (str.trim.length > 0 && !falseStrings.contains(str.toLowerCase)) true else false
-        case None => false
-      }
-    }
-
-    def tagFieldAsInt(key: FieldKey)(implicit tag: Tag): Option[Int] = {
-      try {
-        // TODO potentially frequent exceptions from tag.getFirst, investigate
-        val str = tag.getFirst(key)
-        Option(str.toInt)
-      } catch {
-        case e: Exception => None
-      }
-    }
-
-    def tagFieldAsString(key: FieldKey)(implicit tag: Tag): Option[String] = {
-      try {
-        // TODO potentially frequent exceptions from tag.getFirst, investigate
-        Option(tag.getFirst(key))
-      } catch {
-        case e: Exception => None
-      }
-    }
-    getFileType(path) match {
+    MediaFile.getFileType(path) match {
       case None => None
       case Some(fileType) =>
         val audioFile = AudioFileIO.read(path)
@@ -155,24 +119,40 @@ object Song {
 
   }
 
-    /** get FileType from readable existing file
-      * @return a FileType value or None if the file doesn't have a matching FileType */
-    def getFileType(path: File): Option[FileType] ={
-      try{
-        val fileName = path.getName
-        val length = fileName.length
-        val extensionStart = fileName lastIndexOf '.' match {
-          case x if x == length => fileName.length
-          case -1 => 0
-          case x => x + 1 //skip dot
-        }
-        val extension = fileName.substring( extensionStart, fileName.length).toLowerCase
-        Option(FileType.withName(extension))
-      }
-      catch {
-        case e: Exception => None
-      }
+  private def hasArtwork()(implicit tag: Tag): Boolean = {
+    tag.getFirstArtwork match {
+      case null => false
+      case _ => true
     }
+  }
+
+  private def isCompilation()(implicit tag: Tag): Boolean = {
+    val falseStrings = Set("false", "f", "0") // lower case values that could mean false
+    tagFieldAsString(FieldKey.IS_COMPILATION) match {
+      case Some(str) => if (str.trim.length > 0 && !falseStrings.contains(str.toLowerCase)) true else false
+      case None => false
+    }
+  }
+
+  private def tagFieldAsInt(key: FieldKey)(implicit tag: Tag): Option[Int] = {
+    try {
+      // TODO potentially frequent exceptions from tag.getFirst, investigate
+      val str = tag.getFirst(key)
+      Option(str.toInt)
+    } catch {
+      case e: Exception => None
+    }
+  }
+
+  def tagFieldAsString(key: FieldKey)(implicit tag: Tag): Option[String] = {
+    try {
+      // TODO potentially frequent exceptions from tag.getFirst, investigate
+      Option(tag.getFirst(key))
+    } catch {
+      case e: Exception => None
+    }
+  }
+
   /** Gets a tag for the file. If none exists, it is created, set, and returned. */
   private def getOrCreateTag(path: File): Tag = AudioFileIO.read(path).getTagOrCreateAndSetDefault
   }
