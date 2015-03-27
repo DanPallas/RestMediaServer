@@ -24,10 +24,9 @@ object MediaFile {
    private[mediafiles] def getFileType(path: File): Option[FileType] ={
     try{
       val fileName = path.getName
-      val length = fileName.length
       val extensionStart = fileName lastIndexOf '.' match {
-        case x if x == length => fileName.length
-        case -1 => 0
+        case x if x == fileName.length => fileName.length
+        case -1 => return None
         case x => x + 1 //skip dot
       }
       val extension = fileName.substring( extensionStart, fileName.length).toLowerCase
