@@ -66,6 +66,16 @@ class SongTest extends FunSuite with Matchers {
     }
   }
 
+  test("When Song.apply is passed a flac file, all tags should be read correctly"){
+    val songFixture = Library.Music1.song3Flac
+    val maybeSong = Song(songFixture.path)
+    maybeSong match {
+      case None => maybeSong should not be empty
+      case Some(song) => song shouldBe songFixture
+    }
+
+  }
+
   //todo test that tags are successfully read
 
 }

@@ -135,6 +135,43 @@ object LibraryFixture {
         true
       )
 
+      val song3Flac = new Song(
+        new File(new URI(Music1.path + "/song3.flac")),
+        FileType.flac,
+        0,
+        "1",
+        "FLAC 16 bits",
+        "FLAC 16 bits",
+        44100,
+        0,
+        true,
+        "song3",
+        Option(1),
+        None,
+        Option(1),
+        None,
+        "artist",
+        "album",
+        Option(2014),
+        "Synthpop",
+        "these are comments",
+        "composer",
+        "",
+        "",
+        "conducted",
+        Option(220),
+        "",
+        "isrc",
+        "",
+        "reference libFLAC 1.2.1 20070917",
+        "writer",
+        "the lyrics",
+        "album-artist",
+        false,
+        true
+      )
+
+
     }
   }
 }
