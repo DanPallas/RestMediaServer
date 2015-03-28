@@ -3,6 +3,7 @@ package org.restmediaserver.core.files.mediafiles
 import java.io.File
 
 import org.restmediaserver.core.testfixtures.LibraryFixture.Library
+import org.restmediaserver.core.testsettings.BaseTestSettings
 import org.scalatest.{FunSuite, Matchers}
 
 /**
@@ -10,10 +11,10 @@ import org.scalatest.{FunSuite, Matchers}
  * @author Dan Pallas
  * @since  version 1.0 on 3/23/15.
  */
-class SongTest extends FunSuite with Matchers {
+class SongTest extends FunSuite with Matchers with BaseTestSettings {
+
 
   test("Song.apply should read in an mp3 and return a Song"){
-//    val songFile: File = fileFromTestResource("/musicFiles/library/music1/song3.mp3")
     val songFile = Library.Music1.song3Mp3.path
     val song = Song(songFile)
     song should not be empty
