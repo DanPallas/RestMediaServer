@@ -29,7 +29,7 @@ object LibraryFixture {
       val songBadExtension = new FileFixture {
         val path: File = new File(new URI(Music1.path + "/song.badExtension"))
       }
-      val songMp3 = new Song(
+      val song3Mp3 = new Song(
         new File(new URI(Music1.path + "/song3.mp3")),
         FileType.mp3,
         128,
@@ -63,7 +63,7 @@ object LibraryFixture {
         "album-artist",
         false,
         true)
-      val songM4a = new Song(
+      val song3M4a = new Song(
         new File(new URI(Music1.path + "/song3.m4a")),
         FileType.m4a,
         2,

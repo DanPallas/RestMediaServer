@@ -14,7 +14,7 @@ class SongTest extends FunSuite with Matchers {
 
   test("Song.apply should read in an mp3 and return a Song"){
 //    val songFile: File = fileFromTestResource("/musicFiles/library/music1/song3.mp3")
-    val songFile = Library.Music1.songMp3.path
+    val songFile = Library.Music1.song3Mp3.path
     val song = Song(songFile)
     song should not be empty
   }
@@ -40,7 +40,7 @@ class SongTest extends FunSuite with Matchers {
   }
 
   test("When Song.apply is passed an mp3 all tags should be read in correctly"){
-    val songFixture = Library.Music1.songMp3
+    val songFixture = Library.Music1.song3Mp3
     val maybeSong = Song(songFixture.path)
     maybeSong match {
       case None => maybeSong should not be empty
@@ -49,7 +49,7 @@ class SongTest extends FunSuite with Matchers {
   }
 
   test("When Song.apply is passed an m4a all tags should be read in correctly"){
-    val songFixture = Library.Music1.songM4a
+    val songFixture = Library.Music1.song3M4a
     val maybeSong = Song(songFixture.path)
     maybeSong match {
       case None => maybeSong should not be empty
