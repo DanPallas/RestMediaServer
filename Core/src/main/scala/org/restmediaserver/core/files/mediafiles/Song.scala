@@ -22,29 +22,29 @@ case class Song(override val path: File,
                    sampleRate: Int,
                    trackLength: Int,
                    vbr: Boolean,
-                   title: Option[String],
+                   title: String,
                    trackNumber: Option[Int],
                    trackTotal: Option[Int],
                    discNumber: Option[Int],
                    discTotal: Option[Int],
-                   artist: Option[String],
-                   albumTitle: Option[String],
+                   artist: String,
+                   albumTitle: String,
                    year: Option[Int],
-                   genre: Option[String],
-                   comment: Option[String],
-                   composer: Option[String],
-                   originalArtist: Option[String],
-                   remixer: Option[String],
-                   conductor: Option[String],
+                   genre: String,
+                   comment: String,
+                   composer: String,
+                   originalArtist: String,
+                   remixer: String,
+                   conductor: String,
                    bpm: Option[Int],
-                   grouping: Option[String],
-                   isrc: Option[String],
-                   recordLabel: Option[String],
-                   encoder: Option[String],
-                   lyracist: Option[String],
-                   lyrics: Option[String],
-                   albumArtist: Option[String],
-                   isCompilation: Option[Boolean],
+                   grouping: String,
+                   isrc: String,
+                   recordLabel: String,
+                   encoder: String,
+                   lyracist: String,
+                   lyrics: String,
+                   albumArtist: String,
+                   isCompilation: Boolean,
                    hasArtwork: Boolean
             ) extends MediaFile {
 
@@ -73,7 +73,7 @@ case class Song(override val path: File,
 
 object Song {
   private val SecondsInMinute = 60
-
+  private val FalseStrings = Set("false", "f", "0", "no") // lower case values that could mean false
   def apply(path: File): Option[Song] = {
     MediaFile.getFileType(path) match {
       case None => None
@@ -112,7 +112,7 @@ object Song {
           tagFieldAsString(FieldKey.LYRICIST),
           tagFieldAsString(FieldKey.LYRICS),
           tagFieldAsString(FieldKey.ALBUM_ARTIST),
-          Option(isCompilation()),
+          isCompilation(),
           hasArtwork()
         ))
     }
@@ -127,34 +127,27 @@ object Song {
   }
 
   private def isCompilation()(implicit tag: Tag): Boolean = {
-    val falseStrings = Set("false", "f", "0") // lower case values that could mean false
-    tagFieldAsString(FieldKey.IS_COMPILATION) match {
-      case Some(str) => if (str.trim.length > 0 && !falseStrings.contains(str.toLowerCase)) true else false
-      case None => false
-    }
+    val str: String = tagFieldAsString(FieldKey.IS_COMPILATION)
+    if (str.trim.length > 0 && !FalseStrings.contains(str.toLowerCase)) true else false
   }
 
   private def tagFieldAsInt(key: FieldKey)(implicit tag: Tag): Option[Int] = {
     try {
-      // TODO potentially frequent exceptions from tag.getFirst, investigate
       val str = tag.getFirst(key)
       Option(str.toInt)
     } catch {
-      case e: Exception => None
+      case e: NumberFormatException => None
+      case e: Throwable => throw e
     }
   }
 
-  def tagFieldAsString(key: FieldKey)(implicit tag: Tag): Option[String] = {
-    try {
-      // TODO potentially frequent exceptions from tag.getFirst, investigate
-      Option(tag.getFirst(key))
-    } catch {
-      case e: Exception => None
-    }
+  def tagFieldAsString(key: FieldKey)(implicit tag: Tag): String = {
+      val str = tag.getFirst(key)
+      str
   }
 
   /** Gets a tag for the file. If none exists, it is created, set, and returned. */
   private def getOrCreateTag(path: File): Tag = AudioFileIO.read(path).getTagOrCreateAndSetDefault
-  }
+}
 
 
