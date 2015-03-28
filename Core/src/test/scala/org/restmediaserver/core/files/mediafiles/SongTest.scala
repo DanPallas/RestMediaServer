@@ -19,7 +19,7 @@ class SongTest extends FunSuite with Matchers {
     song should not be empty
   }
 
-  test("Song.apply should return empty option if passed a nonexistant file."){
+  test("Song.apply should return empty option if passed a nonexistent file."){
     val songFile: File = new File("/nonExistentFile")
     val song = Song(songFile)
     song shouldBe empty
@@ -50,6 +50,15 @@ class SongTest extends FunSuite with Matchers {
 
   test("When Song.apply is passed an m4a all tags should be read in correctly"){
     val songFixture = Library.Music1.songM4a
+    val maybeSong = Song(songFixture.path)
+    maybeSong match {
+      case None => maybeSong should not be empty
+      case Some(song) => song shouldBe songFixture
+    }
+  }
+
+  test("When Song.apply is passed an ogg file, all tags should be read in correctly"){
+    val songFixture = Library.Music1.song3Ogg
     val maybeSong = Song(songFixture.path)
     maybeSong match {
       case None => maybeSong should not be empty

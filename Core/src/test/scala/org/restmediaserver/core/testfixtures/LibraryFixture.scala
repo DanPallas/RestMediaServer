@@ -20,7 +20,7 @@ object LibraryFixture {
     lazy val directory = getClass.getResource("/musicFiles/library").toString
 
     object Music1 {
-     val path = directory + "/music1"
+      val path = directory + "/music1"
 
       val mp3 = new FileFixture {
         val path = new File(new URI(Music1.path + "/mp3"))
@@ -98,6 +98,43 @@ object LibraryFixture {
         false,
         true
       )
+
+      val song3Ogg = new Song(
+        new File(new URI(Music1.path + "/song3.ogg")),
+        FileType.ogg,
+        96,
+        "1",
+        "Ogg Vorbis v1",
+        "Ogg Vorbis v1",
+        44100,
+        0,
+        true,
+        "song3",
+        Option(1),
+        None,
+        Option(1),
+        None,
+        "artist",
+        "album",
+        Option(2014),
+        "Synthpop",
+        "these are comments",
+        "composer",
+        "",
+        "",
+        "conducted",
+        Option(220),
+        "",
+        "isrc",
+        "",
+        "Xiph.Org libVorbis I 20120203 (Omnipresent)",
+        "writer",
+        "the lyrics",
+        "album-artist",
+        false,
+        true
+      )
+
     }
   }
 }
