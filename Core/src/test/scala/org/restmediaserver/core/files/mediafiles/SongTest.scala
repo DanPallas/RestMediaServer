@@ -80,9 +80,3 @@ class SongTest extends FunSuite with Matchers with BaseTestSettings {
   //todo test that tags are successfully read
 
 }
-
-object SongTest {
-  private def fileFromTestResource(path: String): File = {
-    new File(getClass.getResource(path).toURI)
-  }
-}
