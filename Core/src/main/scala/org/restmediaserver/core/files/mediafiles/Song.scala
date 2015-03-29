@@ -2,6 +2,7 @@ package org.restmediaserver.core.files.mediafiles
 
 import java.io.File
 
+import com.typesafe.scalalogging.LazyLogging
 import org.jaudiotagger.audio.AudioFileIO
 import org.jaudiotagger.tag.datatype.Artwork
 import org.jaudiotagger.tag.{FieldKey, Tag}
@@ -71,7 +72,7 @@ case class Song(override val path: File,
   }
 }
 
-object Song {
+object Song extends LazyLogging {
   private val SecondsInMinute = 60
   private val FalseStrings = Set("false", "f", "0", "no") // lower case values that could mean false
   def apply(path: File): Option[Song] = {
@@ -136,8 +137,12 @@ object Song {
       val str = tag.getFirst(key)
       Option(str.toInt)
     } catch {
-      case e: NumberFormatException => None
-      case e: Throwable => throw e
+      case e: NumberFormatException =>
+        logger.warn(s"Unable to parse field $key from Song '${tag.getFirst(FieldKey.TITLE)}' by " +
+          s"'${tag.getFirst(FieldKey.ARTIST)}' as Integer")
+        None
+      case e: Throwable =>
+        throw e
     }
   }
 

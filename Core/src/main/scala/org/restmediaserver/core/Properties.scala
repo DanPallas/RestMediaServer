@@ -2,11 +2,13 @@ package org.restmediaserver.core
 
 import java.util.logging.Level
 
+import com.typesafe.scalalogging.LazyLogging
+
 /** All access to properties file(s) should come through this class
   * @author Dan Pallas
   * @since v1.0 on 3/28/15
  */
-object Properties {
+object Properties extends LazyLogging{
   /** logging level for jaudio tagger's build in logging. */
   private val JatLogLevelKey = "jaudiotagger.logging.level"
   /** path to main properties file */
@@ -21,7 +23,7 @@ object Properties {
     }
     catch {
       case e: IllegalArgumentException =>
-        // TODO log warning about invalid property
+        logger.warn(s"illegal value for property $JatLogLevelKey. Setting to 'off'")
         Level.OFF
       case e: Throwable => throw e
     }
