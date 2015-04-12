@@ -11,6 +11,13 @@ import org.restmediaserver.core.files.mediafiles.MediaFile.FileType.FileType
 abstract class MediaFile(){
   def path: File
   def fileType: FileType
+
+  /** mod date of the file which this information came from. If it came from a file, then it's the mod date of the file
+    * when this object was created from it. If it came from the library, then it's the mod date that the media file had
+    * when it was read into this object */
+  def modTime: Long
+  /** library ID */
+  def id: Option[Int]
 }
 
 object MediaFile {

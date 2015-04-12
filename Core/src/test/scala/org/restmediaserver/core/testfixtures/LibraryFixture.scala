@@ -32,6 +32,8 @@ object LibraryFixture {
       val song3Mp3 = new Song(
         new File(new URI(Music1.path + "/song3.mp3")),
         FileType.mp3,
+        new File(new URI(Music1.path + "/song3.mp3")).lastModified(),
+        None,
         128,
         "Mono",
         "mp3",
@@ -66,6 +68,8 @@ object LibraryFixture {
       val song3M4a = new Song(
         new File(new URI(Music1.path + "/song3.m4a")),
         FileType.m4a,
+        new File(new URI(Music1.path + "/song3.m4a")).lastModified(),
+        None,
         2,
         "1",
         "AAC",
@@ -102,6 +106,8 @@ object LibraryFixture {
       val song3Ogg = new Song(
         new File(new URI(Music1.path + "/song3.ogg")),
         FileType.ogg,
+        new File(new URI(Music1.path + "/song3.ogg")).lastModified(),
+        None,
         96,
         "1",
         "Ogg Vorbis v1",
@@ -138,6 +144,8 @@ object LibraryFixture {
       val song3Flac = new Song(
         new File(new URI(Music1.path + "/song3.flac")),
         FileType.flac,
+        new File(new URI(Music1.path + "/song3.flac")).lastModified(),
+        None,
         0,
         "1",
         "FLAC 16 bits",

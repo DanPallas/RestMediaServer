@@ -15,7 +15,9 @@ import scala.collection.JavaConverters._
  * Created by Dan Pallas on 3/19/15.
  */
 case class Song(override val path: File,
-           override val fileType: FileType,
+                  override val fileType: FileType,
+                  override val modTime: Long,
+                  override val id: Option[Int],
                    bitRate: Long,
                    channels: String,
                    encodingType: String,
@@ -84,6 +86,8 @@ object Song extends LazyLogging {
         implicit val tag = audioFile.getTagOrCreateAndSetDefault
         Option(new Song(path,
           fileType,
+          path.lastModified(),
+          None,
           header.getBitRateAsNumber,
           header.getChannels,
           header.getEncodingType,
