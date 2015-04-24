@@ -26,6 +26,12 @@ object MediaFile {
     val mp3, mp4, m4a, flac, ogg = Value
   }
 
+  /** returns a media file of the appropriate type or nothing if the file could not be read or wasn't a media file */
+  def apply(file: File): Option[MediaFile] = {
+    // if videos are implemented this will need to check filetype to decide which apply to call
+    Song(file);
+  }
+
   /** get FileType from readable existing file
     * @return a FileType value or None if the file doesn't have a matching FileType */
    private[mediafiles] def getFileType(path: File): Option[FileType] ={

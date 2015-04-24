@@ -1,5 +1,6 @@
 package org.restmediaserver.core.library
 
+import akka.actor.Actor
 import org.restmediaserver.core.files.mediafiles.Song
 
 import scala.reflect.io.File
@@ -8,9 +9,9 @@ import scala.reflect.io.File
   * @author Dan Pallas
   * @since v1.0 on 4/12/15.
  */
-abstract class MediaLibrary {
-  def putSong(song: Song): Unit
-  def getSong(path: File): Song
-  def getLibraryFolder(path: File): LibraryFolder
-  def putFolder(folder: File): Unit
+abstract class MediaLibrary extends Actor {
+  case class putSongMsg(song: Song)
+  case class getSongMsg(song: Song)
+  case class getLibraryFolderMsg(path: File)
+  case class putFolderMsg(folder: File)
 }
