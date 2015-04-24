@@ -11,12 +11,8 @@ lazy val commonSettings = Seq(
 )
 
 lazy val RestMediaServer = (project in file(".")).
-  aggregate(Core, MediaScanner).
+  aggregate(Core).
   settings(commonSettings: _*)
 
 lazy val Core = (project in file("Core")).
-  settings(commonSettings: _*)
-  
-lazy val MediaScanner = (project in file("MediaScanner")).
-  dependsOn(Core).
   settings(commonSettings: _*)
