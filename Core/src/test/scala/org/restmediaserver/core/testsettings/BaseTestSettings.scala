@@ -9,5 +9,6 @@ import org.restmediaserver.core.Properties
  * @since v1.0  on 3/28/15.
  */
 trait BaseTestSettings {
-  Logger.getLogger("org.jaudiotagger").setLevel(Properties.jatLogLevel)
+  def setup() = Logger.getLogger("org.jaudiotagger").setLevel(Properties.jatLogLevel)
+  setup()
 }
