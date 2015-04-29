@@ -18,12 +18,12 @@ class MediaFileReader extends Actor with LazyLogging{
       try {
         val result = MediaFile(path)
         result match {
-          case Some(song) => sender ! song
+          case Some(song) =>
+            sender ! song
           case None => sender ! Failed(path)
         }
       } catch {
         case e: IOException => {
-          sender ! Failed(path)
           logger.error(s"Failed to load media file $path", e)
         }
         case e: Throwable => throw e
