@@ -2,7 +2,7 @@ package org.restmediaserver.core.files.mediafiles
 
 import java.io.{File, IOException}
 
-import akka.actor.Actor
+import akka.actor.{Props, Actor}
 import com.typesafe.scalalogging.LazyLogging
 
 /** When sent a File that is the path of an actual MediaFile, the file is read in from the file system and
@@ -33,4 +33,6 @@ class MediaFileReader extends Actor with LazyLogging{
 object MediaFileReader{
   /** path could not be read in as MediaFile */
   case class Failed(path: File)
+
+  def props = Props(classOf[MediaFileReader])
 }

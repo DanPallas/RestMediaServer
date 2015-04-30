@@ -2,7 +2,7 @@ package org.restmediaserver.core.mediascanner
 
 import java.io.File
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Props, Actor, ActorRef}
 import com.typesafe.scalalogging.LazyLogging
 import org.restmediaserver.core.ActorMessage
 import org.restmediaserver.core.files.mediafiles.{MediaFile, MediaFileReader, Song}
@@ -46,4 +46,6 @@ class MediaFileUpdater(library: ActorRef, reader: ActorRef) extends Actor with L
 object MediaFileUpdater {
   case class Failed(path: File) extends ActorMessage
   case class Success(path: File) extends ActorMessage
+
+  def props(library: ActorRef, reader: ActorRef) = Props(classOf[MediaFileUpdater], library, reader)
 }

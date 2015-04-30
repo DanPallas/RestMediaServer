@@ -64,8 +64,8 @@ class MediaFileUpdaterTest(_system: ActorSystem) extends TestKit(_system)
   override protected def withFixture(test: OneArgTest) = {
     val reader: TestActorRef[ReaderMock] = TestActorRef(new ReaderMock)
     val library = TestActorRef(new LibraryMock)
-    val updaterProps = Props(classOf[MediaFileUpdater], library,reader)
-    val parent = system.actorOf(Props(classOf[FabricatedParent], testActor, updaterProps))
+    val updaterProps = MediaFileUpdater.props(library,reader)
+    val parent = system.actorOf(FabricatedParent.props(testActor, updaterProps))
     try{
       test(F(reader, library, parent))
     } finally {

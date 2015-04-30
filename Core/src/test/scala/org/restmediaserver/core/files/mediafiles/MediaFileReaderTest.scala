@@ -2,7 +2,7 @@ package org.restmediaserver.core.files.mediafiles
 
 import java.io.File
 
-import akka.actor.{ActorRef, Props}
+import akka.actor.ActorRef
 import akka.pattern.ask
 import org.restmediaserver.core.files.mediafiles.MediaFileReader.Failed
 import org.restmediaserver.core.testfixtures.LibraryFixture.Library
@@ -20,7 +20,7 @@ class MediaFileReaderTest extends fixture.FunSuite with Matchers with AkkaTestSe
   type FixtureParam = ActorRef
 
   def withFixture(test: OneArgTest) = {
-    val reader = system.actorOf(Props[MediaFileReader])
+    val reader = system.actorOf(MediaFileReader.props)
     try{
       test(reader)
     } finally {

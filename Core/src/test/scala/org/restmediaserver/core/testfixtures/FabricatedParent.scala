@@ -14,3 +14,6 @@ class FabricatedParent(testActor: ActorRef, childProps: Props) extends Actor {
     case msg => child forward msg
   }
 }
+object FabricatedParent {
+  def props(testActor: ActorRef, childProps: Props) = Props(classOf[FabricatedParent], testActor, childProps)
+}
