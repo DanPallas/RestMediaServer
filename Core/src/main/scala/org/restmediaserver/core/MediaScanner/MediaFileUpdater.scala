@@ -17,7 +17,7 @@ import org.restmediaserver.core.library.MediaLibrary
   * @author Dan Pallas
   * @since v1.0 on 4/23/15
   */
-class MediaFileUpdater(parent:ActorRef, library: ActorRef, reader: ActorRef) extends Actor with LazyLogging{
+class MediaFileUpdater(library: ActorRef, reader: ActorRef) extends Actor with LazyLogging{
   
   override def receive: Receive = {
     case path: File =>
@@ -34,11 +34,11 @@ class MediaFileUpdater(parent:ActorRef, library: ActorRef, reader: ActorRef) ext
       }
     case MediaFileReader.Failed(path) =>
       logger.error(s"Failed to read $path")
-      parent ! MediaFileUpdater.Failed(path)
+      context.parent ! MediaFileUpdater.Failed(path)
     case MediaLibrary.SuccessfulPut(path) =>
       logger.debug(s"received successful put for file $path")
-      parent ! MediaFileUpdater.Success(path)
-    case MediaLibrary.NotPutOlder(path) => parent ! MediaFileUpdater.Success(path)
+      context.parent ! MediaFileUpdater.Success(path)
+    case MediaLibrary.NotPutOlder(path) => context.parent ! MediaFileUpdater.Success(path)
     case MediaLibrary.PutException(path, ex) =>
       logger.error(s"failed to put $path", ex)
   }

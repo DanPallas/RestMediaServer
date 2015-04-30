@@ -7,7 +7,7 @@ import akka.testkit.{TestActorRef, TestKit}
 import org.restmediaserver.core.ActorMessage
 import org.restmediaserver.core.files.mediafiles.MediaFileReader
 import org.restmediaserver.core.library.MediaLibrary
-import org.restmediaserver.core.testfixtures.LibraryFixture
+import org.restmediaserver.core.testfixtures.{FabricatedParent, LibraryFixture}
 import org.restmediaserver.core.testsettings.BaseTestSettings
 import org.scalatest.fixture
 import org.scalatest.Matchers._
@@ -58,26 +58,27 @@ class MediaFileUpdaterTest(_system: ActorSystem) extends TestKit(_system)
 
   case class F(reader: TestActorRef[ReaderMock],
                library: TestActorRef[LibraryMock],
-               updater: ActorRef)
+               updaterParent: ActorRef)
   override type FixtureParam = F
 
   override protected def withFixture(test: OneArgTest) = {
     val reader: TestActorRef[ReaderMock] = TestActorRef(new ReaderMock)
     val library = TestActorRef(new LibraryMock)
-    val updater = system.actorOf(Props(classOf[MediaFileUpdater], this.testActor, library,reader))
+    val updaterProps = Props(classOf[MediaFileUpdater], library,reader)
+    val parent = system.actorOf(Props(classOf[FabricatedParent], testActor, updaterProps))
     try{
-      test(F(reader,library,updater))
+      test(F(reader, library, parent))
     } finally {
       system.stop(reader)
       system.stop(library)
-      system.stop(updater)
+      system.stop(parent)
     }
   }
 
   test("when MediaFileUpdater is sent a valid song file it should read the file, update, and return success"){
     f =>
       val song = LibraryFixture.Library.Music1.song3M4a
-      f.updater ! song.path
+      f.updaterParent ! song.path
       expectMsg(MediaFileUpdater.Success(song.path))
 
       val reader = f.reader.underlyingActor
@@ -92,7 +93,7 @@ class MediaFileUpdaterTest(_system: ActorSystem) extends TestKit(_system)
   test("when MediaFileUpdater is sent a bad path it should return a failure"){
     f =>
       val badfile = new File("badfile")
-      f.updater ! badfile
+      f.updaterParent ! badfile
       expectMsg(MediaFileUpdater.Failed(badfile))
 
       val reader = f.reader.underlyingActor
@@ -107,7 +108,7 @@ class MediaFileUpdaterTest(_system: ActorSystem) extends TestKit(_system)
     "responds with Success"){
     f =>
       val song = LibraryFixture.Library.Music1.song3Flac
-      f.updater ! song.path
+      f.updaterParent ! song.path
       expectMsg(MediaFileUpdater.Success(song.path))
 
       val reader = f.reader.underlyingActor
