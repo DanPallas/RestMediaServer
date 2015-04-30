@@ -13,10 +13,19 @@ object Properties extends LazyLogging{
   private val JatLogLevelKey = "jaudiotagger.logging.level"
   /** path to main properties file */
   private val ApplicationPropertiesFile = "/application.properties"
-  private val props = loadProperties()
+  /** key for main actor system name key */
+  private val MainActorSystemKey = "actor.system.main"
+
+  /** loaded props map */
+  lazy val props = {
+    val props = new java.util.Properties()
+    val propFile = getClass.getResourceAsStream(ApplicationPropertiesFile)
+    props.load(propFile)
+    props
+  }
 
   /** JAudioTagger logging Level */
-  def jatLogLevel: Level = {
+  lazy val jatLogLevel: Level = {
     val str = props.getProperty(JatLogLevelKey,"OFF").toUpperCase
     try {
       Level.parse(str)
@@ -29,11 +38,7 @@ object Properties extends LazyLogging{
     }
   }
 
-  private def loadProperties(): java.util.Properties = {
-    val props = new java.util.Properties()
-    val propFile = getClass.getResourceAsStream(ApplicationPropertiesFile)
-    props.load(propFile)
-    props
-  }
+  /** main actor system name */
+  lazy val mainActorSystemName = props.get(MainActorSystemKey)
 
 }
