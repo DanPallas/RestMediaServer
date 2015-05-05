@@ -9,7 +9,7 @@ import org.restmediaserver.core.files.mediafiles.MediaFileReader
 import org.restmediaserver.core.library.MediaLibrary
 import org.restmediaserver.core.testfixtures.{FabricatedParent, LibraryFixture}
 import org.restmediaserver.core.testsettings.BaseTestSettings
-import org.scalatest.fixture
+import org.scalatest.{BeforeAndAfterAll, fixture}
 import org.scalatest.Matchers._
 
 import scala.collection.mutable
@@ -18,7 +18,7 @@ import scala.collection.mutable
  * @since v1.0 on 4/27/15.
  */
 class MediaFileUpdaterTest(_system: ActorSystem) extends TestKit(_system)
-      with fixture.FunSuiteLike with BaseTestSettings {
+      with fixture.FunSuiteLike with BaseTestSettings with BeforeAndAfterAll {
   def this() = this(ActorSystem("MediaFileUpdaterTest"))
   class ReaderMock extends Actor {
     val received = mutable.Buffer[File]()
@@ -120,5 +120,5 @@ class MediaFileUpdaterTest(_system: ActorSystem) extends TestKit(_system)
       library.received should contain (MediaLibrary.PutSongMsg(song))
   }
 
-
+  override protected def afterAll(): Unit = TestKit.shutdownActorSystem(system)
 }

@@ -34,7 +34,7 @@ object MediaFile {
 
   /** get FileType from readable existing file
     * @return a FileType value or None if the file doesn't have a matching FileType */
-   private[mediafiles] def getFileType(path: File): Option[FileType] ={
+    def getFileType(path: File): Option[FileType] ={
     try{
       val fileName = path.getName
       val extensionStart = fileName lastIndexOf '.' match {

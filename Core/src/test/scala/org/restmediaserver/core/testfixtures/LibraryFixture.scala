@@ -1,7 +1,7 @@
 package org.restmediaserver.core.testfixtures
 
 import java.io.File
-import java.net.URI
+import java.nio.file.Paths
 
 import org.restmediaserver.core.files.mediafiles.MediaFile.FileType
 import org.restmediaserver.core.files.mediafiles.Song
@@ -17,22 +17,22 @@ object LibraryFixture {
   }
 
   object Library {
-    lazy val directory = getClass.getResource("/musicFiles/library").toString
+    lazy val directory: File = Paths.get(this.getClass.getResource("/musicFiles/library").toURI).toFile
 
     object Music1 {
-      val path = directory + "/music1"
+      val path = new File(directory, "music1")
 
       val mp3 = new FileFixture {
-        val path = new File(new URI(Music1.path + "/mp3"))
+        val path = new File(Music1.path, "mp3")
       }
 
       val songBadExtension = new FileFixture {
-        val path: File = new File(new URI(Music1.path + "/song.badExtension"))
+        val path: File = new File(Music1.path, "song.badExtension")
       }
       val song3Mp3 = new Song(
-        new File(new URI(Music1.path + "/song3.mp3")),
+        new File(Music1.path, "song3.mp3"),
         FileType.mp3,
-        new File(new URI(Music1.path + "/song3.mp3")).lastModified(),
+        new File(Music1.path, "song3.mp3").lastModified(),
         None,
         128,
         "Mono",
@@ -66,9 +66,9 @@ object LibraryFixture {
         false,
         true)
       val song3M4a = new Song(
-        new File(new URI(Music1.path + "/song3.m4a")),
+        new File(Music1.path, "song3.m4a"),
         FileType.m4a,
-        new File(new URI(Music1.path + "/song3.m4a")).lastModified(),
+        new File(Music1.path, "song3.m4a").lastModified(),
         None,
         2,
         "1",
@@ -104,9 +104,9 @@ object LibraryFixture {
       )
 
       val song3Ogg = new Song(
-        new File(new URI(Music1.path + "/song3.ogg")),
+        new File(Music1.path, "song3.ogg"),
         FileType.ogg,
-        new File(new URI(Music1.path + "/song3.ogg")).lastModified(),
+        new File(Music1.path, "song3.ogg").lastModified(),
         None,
         96,
         "1",
@@ -142,9 +142,9 @@ object LibraryFixture {
       )
 
       val song3Flac = new Song(
-        new File(new URI(Music1.path + "/song3.flac")),
+        new File(Music1.path, "song3.flac"),
         FileType.flac,
-        new File(new URI(Music1.path + "/song3.flac")).lastModified(),
+        new File(Music1.path, "song3.flac").lastModified(),
         None,
         0,
         "1",

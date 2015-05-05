@@ -15,6 +15,9 @@ abstract class MediaLibrary extends Actor {
 }
 object MediaLibrary {
   case class PutSongMsg(song: Song) extends ActorMessage
+  case class RemoveSong(path: String) extends ActorMessage
+  case class SuccessfulRemoveSong(path: String) extends ActorMessage
+  case class RemoveSongException(path: String, ex: Exception) extends ActorMessage
   case class SuccessfulPut(path: File) extends ActorMessage
   case class NotPutOlder(path: File) extends ActorMessage
   case class PutException(path: File, ex: Exception) extends ActorMessage
