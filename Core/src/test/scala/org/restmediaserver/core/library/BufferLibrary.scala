@@ -2,6 +2,7 @@ package org.restmediaserver.core.library
 
 import java.io.File
 
+import com.typesafe.scalalogging.LazyLogging
 import org.restmediaserver.core.files.mediafiles.MediaFile
 
 import scala.collection.mutable
@@ -12,22 +13,23 @@ import scala.concurrent.{ExecutionContext, Future}
  * @author Dan Pallas
  * @since v1.0 on 5/9/15.
  */
-class BufferLibrary()(implicit ec: ExecutionContext) extends MediaLibrary{
+class BufferLibrary()(implicit ec: ExecutionContext) extends MediaLibrary with LazyLogging{
   var contents = mutable.Buffer[MediaFile]()
 
   override def getLibraryFolder(path: File): Future[Option[LibraryFolder]] = {
-    val contained = contents.synchronized {
-      contents.filter(_.path.getParent == path.getPath) toSeq
-    }
-    val children = contained.map(f => LibraryFile(f.path.getPath, f.path.lastModified()))
     Future {
-      if(children.nonEmpty) Some(LibraryFolder(children)) else None }
+      val contained = contents.synchronized {
+        contents.filter(_.path.getParent == path.getPath) toSeq;
+      }
+      val children = contained.map(f => LibraryFile(f.path.getPath, f.path.lastModified()))
+      if(children.nonEmpty) Some(LibraryFolder(children)) else None
+    }
   }
 
   override def putMediaFile(mediaFile: MediaFile): Future[Boolean] = {
-    contents.synchronized {
-      val existing: Option[MediaFile] = contents.find(_.path.getPath == mediaFile.path.getPath)
-      Future {
+    Future {
+      contents.synchronized {
+        val existing: Option[MediaFile] = contents.find(_.path.getPath == mediaFile.path.getPath)
         existing match {
           case Some(e) =>
             if (e.modTime < mediaFile.modTime) {
@@ -46,8 +48,8 @@ class BufferLibrary()(implicit ec: ExecutionContext) extends MediaLibrary{
   }
 
   override def removeMediaFile(path: String): Future[Boolean] = {
-    contents.synchronized {
-      Future {
+    Future {
+      contents.synchronized {
         val existing = contents.find(_.path.getPath == path)
         existing match {
           case Some(e) =>
