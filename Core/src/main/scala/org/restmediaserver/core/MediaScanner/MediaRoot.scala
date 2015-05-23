@@ -2,10 +2,11 @@ package org.restmediaserver.core.mediascanner
 
 import java.io.File
 
-import org.restmediaserver.core.files.mediafiles.{MediaFile, AsyncMediaFileService}
+import com.typesafe.scalalogging.LazyLogging
+import org.restmediaserver.core.files.mediafiles.{AsyncMediaFileService, MediaFile}
 import org.restmediaserver.core.library.{LibraryFile, LibraryFolder, MediaLibrary}
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 
 /** A root media folder who's media contents should be kept in sync with the library.
   * @param path root folder that this class should operate on
@@ -18,9 +19,9 @@ import scala.concurrent.{Future, ExecutionContext}
  */
 class MediaRoot(private val path: File,
                 implicit val lib: MediaLibrary,
-                implicit private val ec: ExecutionContext,
                 implicit private val asmf: AsyncMediaFileService,
-                private val fileFilter: File => Boolean) {
+                private val fileFilter: File => Boolean,
+                implicit private val ec: ExecutionContext) extends LazyLogging{
 
   /**
    * Start scan for media files, updating the library for changes since last scan. If watching will also be used
@@ -28,7 +29,7 @@ class MediaRoot(private val path: File,
    * the library is updated.
    * @return true if no errors occure during scan, otherwise false
    */
-  def startScan(threads: Double): Future[Int] = {
+  def startScan(): Future[Int] = {
     /** get list including this path and all subdirectories under this path */
     def fetchDirectoryList(): Vector[File] = {
       def helper(dir: File): Array[File] ={
@@ -52,9 +53,17 @@ class MediaRoot(private val path: File,
         toRemove map (Removeable(_)) toVector
       }
       def getPutables(lf: LibraryFolder, currentFiles: Seq[File]): IndexedSeq[Putable] = {
-        val isNewer = (currentFile: File) =>
-          lf.children.exists(f => f.path == currentFile.getPath && f.modTime < currentFile.lastModified())
-        currentFiles filter isNewer map (Putable(_)) toVector
+        logger.debug(s"lf: $lf \n currentFiles $currentFiles")
+        val isNewer = (currentFile: File) => {
+          val existing = lf.children find (_.path == currentFile.getPath)
+          existing match {
+            case Some(f) => f.modTime < currentFile.lastModified()
+            case None => true
+          }
+        }
+        val putables: Vector[Putable] = currentFiles.filter(isNewer(_)).map(new Putable(_)).toVector
+        logger.debug(s"putables: ${putables.toString()}")
+        putables
       }
       def getCurrentFiles(dir: File): Seq[File] =
         (path.listFiles() filter (_.isFile) filter (f => MediaFile.getFileType(f).isDefined && fileFilter(f))).toSeq
@@ -113,4 +122,23 @@ class MediaRoot(private val path: File,
     }
   }
 }
+object MediaRoot {
+  /** @param path root folder that this class should operate on
+    * @param lib library which should be kept in sync with this media root
+    * @param ec Execution context to use for Async operations Not in asmf and the library
+    * @param fileFilter pred. Files for which fileFilter returns false will not be added to the library and will be
+    *                   removed from the library if they already exist
+    * @return new MediaRoot
+    * */
+  def apply(path: File, lib: MediaLibrary, asmf: AsyncMediaFileService, fileFilter: File => Boolean)
+           (implicit ec: ExecutionContext): MediaRoot = new MediaRoot(path, lib, asmf, fileFilter, ec)
 
+  /** unfiltered MediaRoot
+    * @param path root folder that this class should operate on
+    * @param lib library which should be kept in sync with this media root
+    * @param ec Execution context to use for Async operations Not in asmf and the library
+    * @return new MediaRoot
+    */
+  def apply(path: File, lib: MediaLibrary, asmf: AsyncMediaFileService)
+           (implicit ec: ExecutionContext): MediaRoot = new MediaRoot(path, lib, asmf, x => true, ec)
+}
