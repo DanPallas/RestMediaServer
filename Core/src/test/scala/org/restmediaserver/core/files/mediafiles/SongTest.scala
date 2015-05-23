@@ -16,7 +16,7 @@ class SongTest extends FunSuite with Matchers with BaseTestSettings {
 
   test("Song.apply should read in an mp3 and return a Song"){
     val songFile = Library.Music1.song3Mp3.path
-    val song = Song(songFile)
+    val song = Song(new File(songFile))
     song should not be empty
   }
 
@@ -42,7 +42,7 @@ class SongTest extends FunSuite with Matchers with BaseTestSettings {
 
   test("When Song.apply is passed an mp3 all tags should be read in correctly"){
     val songFixture = Library.Music1.song3Mp3
-    val maybeSong = Song(songFixture.path)
+    val maybeSong = Song(new File(songFixture.path))
     maybeSong match {
       case None => maybeSong should not be empty
       case Some(song) => song shouldBe songFixture
@@ -51,7 +51,7 @@ class SongTest extends FunSuite with Matchers with BaseTestSettings {
 
   test("When Song.apply is passed an m4a all tags should be read in correctly"){
     val songFixture = Library.Music1.song3M4a
-    val maybeSong = Song(songFixture.path)
+    val maybeSong = Song(new File(songFixture.path))
     maybeSong match {
       case None => maybeSong should not be empty
       case Some(song) => song shouldBe songFixture
@@ -60,7 +60,7 @@ class SongTest extends FunSuite with Matchers with BaseTestSettings {
 
   test("When Song.apply is passed an ogg file, all tags should be read in correctly"){
     val songFixture = Library.Music1.song3Ogg
-    val maybeSong = Song(songFixture.path)
+    val maybeSong = Song(new File(songFixture.path))
     maybeSong match {
       case None => maybeSong should not be empty
       case Some(song) => song shouldBe songFixture
@@ -69,7 +69,7 @@ class SongTest extends FunSuite with Matchers with BaseTestSettings {
 
   test("When Song.apply is passed a flac file, all tags should be read correctly"){
     val songFixture = Library.Music1.song3Flac
-    val maybeSong = Song(songFixture.path)
+    val maybeSong = Song(new File(songFixture.path))
     maybeSong match {
       case None => maybeSong should not be empty
       case Some(song) => song shouldBe songFixture

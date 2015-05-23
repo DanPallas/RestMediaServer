@@ -12,7 +12,7 @@ import org.scalatest.{Matchers, FunSuite}
 class MediaFileTest extends FunSuite with Matchers with BaseTestSettings {
   test("When given a valid file that is a song, a song should be returned"){
     val songFile = Library.Music1.song3Mp3.path
-    val returnVal = MediaFile(songFile)
+    val returnVal = MediaFile(new File(songFile))
     returnVal match {
       case None => fail()
       case Some(shouldBeSong) => shouldBeSong.isInstanceOf[Song] shouldBe true

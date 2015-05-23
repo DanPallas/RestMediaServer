@@ -29,7 +29,7 @@ object LibraryFixture {
       val songBadExtension = new FileFixture {
         val path: File = new File(Music1.path, "song.badExtension")
       }
-      val song3Mp3 = new Song(
+      val song3Mp3 = Song(
         new File(Music1.path, "song3.mp3"),
         FileType.mp3,
         new File(Music1.path, "song3.mp3").lastModified(),
@@ -65,7 +65,7 @@ object LibraryFixture {
         "album-artist",
         false,
         true)
-      val song3M4a = new Song(
+      val song3M4a = Song(
         new File(Music1.path, "song3.m4a"),
         FileType.m4a,
         new File(Music1.path, "song3.m4a").lastModified(),
@@ -103,7 +103,7 @@ object LibraryFixture {
         true
       )
 
-      val song3Ogg = new Song(
+      val song3Ogg = Song(
         new File(Music1.path, "song3.ogg"),
         FileType.ogg,
         new File(Music1.path, "song3.ogg").lastModified(),
@@ -141,7 +141,7 @@ object LibraryFixture {
         true
       )
 
-      val song3Flac = new Song(
+      val song3Flac = Song(
         new File(Music1.path, "song3.flac"),
         FileType.flac,
         new File(Music1.path, "song3.flac").lastModified(),
@@ -185,7 +185,7 @@ object LibraryFixture {
 
   /** returns a song with an earlier modTime than the input */
   def older(song: Song): Song = {
-    Song(song.path,
+    Song(new File(song.path),
       song.fileType,
       song.modTime - 1000,
       song.id,
@@ -224,7 +224,7 @@ object LibraryFixture {
 
   /** returns a song with a later modTime than the input */
   def newer(song: Song): Song = {
-    Song(song.path,
+    Song(new File(song.path),
       song.fileType,
       song.modTime + 1000,
       song.id,

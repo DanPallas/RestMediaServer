@@ -9,8 +9,10 @@ import org.restmediaserver.core.files.mediafiles.MediaFile.FileType.FileType
  * @since version 1.0 on 3/19/15.
  */
 abstract class MediaFile(){
-  def path: File
+  def path: String
   def fileType: FileType
+  private val file = new File(path)
+  def parent = file.getParent
 
   /** mod date of the file which this information came from. If it came from a file, then it's the mod date of the file
     * when this object was created from it. If it came from the library, then it's the mod date that the media file had

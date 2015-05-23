@@ -67,7 +67,7 @@ class MediaRootTest extends fixture.FunSuite with BaseTestSettings {
     f.lib.contents += LibraryFixture.older(toRemove)
     val root = MediaRoot(Music1.path,f.lib,f.asmf)
     Await.result(root.startScan(), waitTime) shouldBe 5
-    f.lib.removeMediaFileCalls should contain (toRemove.path.getPath)
+    f.lib.removeMediaFileCalls should contain (toRemove.path)
     f.lib.removeMediaFileCalls.size shouldBe 1
   }
 

@@ -33,8 +33,8 @@ class BufferLibraryTest extends FunSuite with BaseTestSettings{
     lib.contents = mutable.Buffer(Music1.song3Flac,Music1.song3M4a)
     val folder = Await.result(lib.getLibraryFolder(Music1.path), waitTime)
     folder.orNull.children should contain only
-      (LibraryFile(Music1.song3Flac.path.getPath, Music1.song3Flac.path.lastModified()),
-        LibraryFile(Music1.song3M4a.path.getPath, Music1.song3M4a.path.lastModified()))
+      (LibraryFile(Music1.song3Flac.path, Music1.song3Flac.modTime),
+        LibraryFile(Music1.song3M4a.path, Music1.song3M4a.modTime))
   }
 
   test("getLibraryFolder uses MediaFile.modTime for its modTime"){
@@ -77,7 +77,7 @@ class BufferLibraryTest extends FunSuite with BaseTestSettings{
   test("When removing a file that does not exist, should not remove anything"){
     val lib = BufferLibrary()
     lib.contents += Music1.song3Flac
-    Await.result(lib.removeMediaFile(Music1.song3M4a.path.getPath),waitTime) shouldBe false
+    Await.result(lib.removeMediaFile(Music1.song3M4a.path),waitTime) shouldBe false
     lib.contents should contain only Music1.song3Flac
   }
 
@@ -85,7 +85,7 @@ class BufferLibraryTest extends FunSuite with BaseTestSettings{
     val lib = BufferLibrary()
     lib.contents += Music1.song3Flac
     lib.contents += Music1.song3M4a
-    Await.result(lib.removeMediaFile(Music1.song3M4a.path.getPath),waitTime) shouldBe true
+    Await.result(lib.removeMediaFile(Music1.song3M4a.path),waitTime) shouldBe true
     lib.contents should contain only Music1.song3Flac
   }
 }

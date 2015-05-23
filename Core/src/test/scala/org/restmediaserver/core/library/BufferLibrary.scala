@@ -19,9 +19,9 @@ class BufferLibrary()(implicit ec: ExecutionContext) extends MediaLibrary with L
   override def getLibraryFolder(path: File): Future[Option[LibraryFolder]] = {
     Future {
       val contained = contents.synchronized {
-        contents.filter(_.path.getParent == path.getPath) toSeq;
+        contents.filter(_.parent == path.getPath) toSeq;
       }
-      val children = contained.map(f => LibraryFile(f.path.getPath, f.modTime))
+      val children = contained.map(f => LibraryFile(f.path, f.modTime))
       if(children.nonEmpty) Some(LibraryFolder(children)) else None
     }
   }
@@ -29,7 +29,7 @@ class BufferLibrary()(implicit ec: ExecutionContext) extends MediaLibrary with L
   override def putMediaFile(mediaFile: MediaFile): Future[Boolean] = {
     Future {
       contents.synchronized {
-        val existing: Option[MediaFile] = contents.find(_.path.getPath == mediaFile.path.getPath)
+        val existing: Option[MediaFile] = contents.find(_.path == mediaFile.path)
         existing match {
           case Some(e) =>
             if (e.modTime < mediaFile.modTime) {
@@ -50,7 +50,7 @@ class BufferLibrary()(implicit ec: ExecutionContext) extends MediaLibrary with L
   override def removeMediaFile(path: String): Future[Boolean] = {
     Future {
       contents.synchronized {
-        val existing = contents.find(_.path.getPath == path)
+        val existing = contents.find(_.path == path)
         existing match {
           case Some(e) =>
             contents -= e

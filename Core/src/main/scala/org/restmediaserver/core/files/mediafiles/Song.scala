@@ -14,7 +14,7 @@ import scala.collection.JavaConverters._
  * updated then it should change for all references.
  * Created by Dan Pallas on 3/19/15.
  */
-case class Song(override val path: File,
+case class Song private(override val path: String,
                   override val fileType: FileType,
                   override val modTime: Long,
                   override val id: Option[Int],
@@ -50,7 +50,7 @@ case class Song(override val path: File,
                    isCompilation: Boolean,
                    hasArtwork: Boolean
             ) extends MediaFile {
-
+  private val file = new File(path)
   def trackLengthPrettyString: String = {
     val minutes = trackLength / Song.SecondsInMinute
     val seconds = trackLength % Song.SecondsInMinute
@@ -60,7 +60,7 @@ case class Song(override val path: File,
   /** read list of artwork from music file */
   def readArtwork(): List[Artwork] = {
     if (hasArtwork) {
-      val tag = AudioFileIO.read(this.path).getTag
+      val tag = AudioFileIO.read(this.file).getTag
       tag.getArtworkList.asScala.toList
     } else List[Artwork]()
   }
@@ -68,7 +68,7 @@ case class Song(override val path: File,
   /** read first artwork from music file */
   def readFirstArtwork(): Option[Artwork] = {
     if (hasArtwork) {
-      val tag = Song.getOrCreateTag(this.path)
+      val tag = Song.getOrCreateTag(this.file)
       Option(tag.getFirstArtwork)
     } else None
   }
@@ -77,6 +77,81 @@ case class Song(override val path: File,
 object Song extends LazyLogging {
   private val SecondsInMinute = 60
   private val FalseStrings = Set("false", "f", "0", "no") // lower case values that could mean false
+  def apply(
+  file: File,
+  fileType: FileType,
+  modTime: Long,
+  id: Option[Int],
+  bitRate: Long,
+  channels: String,
+  encodingType: String,
+  format: String,
+  sampleRate: Int,
+  trackLength: Int,
+  vbr: Boolean,
+  title: String,
+  trackNumber: Option[Int],
+  trackTotal: Option[Int],
+  discNumber: Option[Int],
+  discTotal: Option[Int],
+  artist: String,
+  albumTitle: String,
+  year: Option[Int],
+  genre: String,
+  comment: String,
+  composer: String,
+  originalArtist: String,
+  remixer: String,
+  conductor: String,
+  bpm: Option[Int],
+  grouping: String,
+  isrc: String,
+  recordLabel: String,
+  encoder: String,
+  lyracist: String,
+  lyrics: String,
+  albumArtist: String,
+  isCompilation: Boolean,
+  hasArtwork: Boolean
+             ) = {
+    new Song(
+      file.getAbsolutePath,
+      fileType,
+      modTime,
+      id,
+      bitRate,
+      channels,
+      encodingType,
+      format,
+      sampleRate,
+      trackLength,
+      vbr,
+      title,
+      trackNumber,
+      trackTotal,
+      discNumber,
+      discTotal,
+      artist,
+      albumTitle,
+      year,
+      genre,
+      comment,
+      composer,
+      originalArtist,
+      remixer,
+      conductor,
+      bpm,
+      grouping,
+      isrc,
+      recordLabel,
+      encoder,
+      lyracist,
+      lyrics,
+      albumArtist,
+      isCompilation,
+      hasArtwork
+    )
+  }
   def apply(path: File): Option[Song] = {
     MediaFile.getFileType(path) match {
       case None => None
@@ -84,7 +159,9 @@ object Song extends LazyLogging {
         val audioFile = AudioFileIO.read(path)
         val header = audioFile.getAudioHeader
         implicit val tag = audioFile.getTagOrCreateAndSetDefault
-        Option(new Song(path,
+        Option(
+          new Song(
+            path.getAbsolutePath,
           fileType,
           path.lastModified(),
           None,
