@@ -50,7 +50,6 @@ case class Song private(override val path: String,
                    isCompilation: Boolean,
                    hasArtwork: Boolean
             ) extends MediaFile {
-  private val file = new File(path)
   def trackLengthPrettyString: String = {
     val minutes = trackLength / Song.SecondsInMinute
     val seconds = trackLength % Song.SecondsInMinute
@@ -60,7 +59,7 @@ case class Song private(override val path: String,
   /** read list of artwork from music file */
   def readArtwork(): List[Artwork] = {
     if (hasArtwork) {
-      val tag = AudioFileIO.read(this.file).getTag
+      val tag = AudioFileIO.read(file).getTag
       tag.getArtworkList.asScala.toList
     } else List[Artwork]()
   }

@@ -11,7 +11,7 @@ import org.restmediaserver.core.files.mediafiles.MediaFile.FileType.FileType
 abstract class MediaFile(){
   def path: String
   def fileType: FileType
-  private val file = new File(path)
+  protected val file = new File(path)
   def parent = file.getParent
 
   /** mod date of the file which this information came from. If it came from a file, then it's the mod date of the file
