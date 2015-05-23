@@ -37,6 +37,14 @@ class BufferLibraryTest extends FunSuite with BaseTestSettings{
         LibraryFile(Music1.song3M4a.path.getPath, Music1.song3M4a.path.lastModified()))
   }
 
+  test("getLibraryFolder uses MediaFile.modTime for its modTime"){
+    val lib = BufferLibrary()
+    val older = LibraryFixture.older(Music1.song3Flac)
+    lib.contents += older
+    val folder = Await.result(lib.getLibraryFolder(Music1.path), waitTime)
+    folder.get.children(0).modTime shouldBe older.modTime
+  }
+
   test("when putting a file that is not in the library it returns a future of true"){
     val lib = BufferLibrary()
     Await.result(lib.putMediaFile(Music1.song3Flac), waitTime) shouldBe true

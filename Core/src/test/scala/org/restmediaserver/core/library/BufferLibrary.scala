@@ -21,7 +21,7 @@ class BufferLibrary()(implicit ec: ExecutionContext) extends MediaLibrary with L
       val contained = contents.synchronized {
         contents.filter(_.path.getParent == path.getPath) toSeq;
       }
-      val children = contained.map(f => LibraryFile(f.path.getPath, f.path.lastModified()))
+      val children = contained.map(f => LibraryFile(f.path.getPath, f.modTime))
       if(children.nonEmpty) Some(LibraryFolder(children)) else None
     }
   }
