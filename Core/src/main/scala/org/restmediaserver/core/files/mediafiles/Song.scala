@@ -10,8 +10,7 @@ import org.restmediaserver.core.files.mediafiles.MediaFile.FileType.FileType
 
 import scala.collection.JavaConverters._
 
-/** Mutable because nothing should hold a reference to a file that is no longer valid. For example if the title is
- * updated then it should change for all references.
+/**
  * Created by Dan Pallas on 3/19/15.
  */
 case class Song private(override val path: String,
