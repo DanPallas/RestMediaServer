@@ -1,10 +1,10 @@
 package org.restmediaserver.core.testfixtures
 
-import java.io.File
+import java.io.{FileFilter, File}
 import java.nio.file.Paths
 
 import org.restmediaserver.core.files.mediafiles.MediaFile.FileType
-import org.restmediaserver.core.files.mediafiles.Song
+import org.restmediaserver.core.files.mediafiles.{MediaFile, Song}
 
 /**
  * @author Dan Pallas
@@ -12,12 +12,13 @@ import org.restmediaserver.core.files.mediafiles.Song
  */
 
 object LibraryFixture {
-  trait FileFixture{
+
+  trait FileFixture {
     def path: File
   }
 
   object Library {
-    lazy val directory: File = Paths.get(this.getClass.getResource("/musicFiles/library").toURI).toFile
+    lazy val directory: File = Paths.get(this.getClass.getResource("/musicFiles/library").toURI).toAbsolutePath.toFile
 
     object Music1 {
       val path = new File(directory, "music1")
@@ -178,8 +179,24 @@ object LibraryFixture {
         false,
         true
       )
+    }
 
-
+    object Music2{
+      lazy val path = new File(directory, "music2")
+      lazy val mediaFiles = {
+        def getFiles(path: File): IndexedSeq[File] = {
+          val mfs = path.listFiles(new FileFilter {
+            override def accept(pathname: File): Boolean = MediaFile.getFileType(pathname) isDefined
+          })
+          val childDirs = path.listFiles(new FileFilter {
+            override def accept(pathname: File): Boolean = pathname isDirectory
+          })
+          val childMfs = childDirs flatMap getFiles
+          mfs.toVector ++ childMfs
+        }
+        val opts = getFiles(path) map (MediaFile(_)) filter (_.isDefined)
+        opts map (_.get)
+      }
     }
   }
 
@@ -261,3 +278,4 @@ object LibraryFixture {
       song.hasArtwork)
   }
 }
+

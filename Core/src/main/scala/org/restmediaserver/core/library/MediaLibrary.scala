@@ -14,6 +14,8 @@ abstract class MediaLibrary {
   def getLibraryFolder(path: File): Future[Option[LibraryFolder]]
   def removeMediaFile(path: String): Future[Boolean]
   def putMediaFile(mediaFile: MediaFile): Future[Boolean]
+  def getSubDirs(parent: File): Future[Set[String]]
+  def removeLibraryFolder(path: String): Future[Int]
 }
 object MediaLibrary {
 }

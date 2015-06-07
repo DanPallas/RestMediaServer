@@ -2,8 +2,9 @@ package org.restmediaserver.core.library
 
 import java.io.File
 
+import org.restmediaserver.core.files.mediafiles.MediaFile
 import org.restmediaserver.core.testfixtures.LibraryFixture
-import org.restmediaserver.core.testfixtures.LibraryFixture.Library.Music1
+import org.restmediaserver.core.testfixtures.LibraryFixture.Library.{Music2, Music1}
 import org.restmediaserver.core.testsettings.BaseTestSettings
 import org.scalatest.FunSuite
 import org.scalatest.Matchers._
@@ -87,5 +88,25 @@ class BufferLibraryTest extends FunSuite with BaseTestSettings{
     lib.contents += Music1.song3M4a
     Await.result(lib.removeMediaFile(Music1.song3M4a.path),waitTime) shouldBe true
     lib.contents should contain only Music1.song3Flac
+  }
+
+  test("getSubDirs returns a set of the parent folders of all media files"){
+    val lib = BufferLibrary()
+    lib.contents ++= Music2.mediaFiles
+    val dirs = Await.result(lib.getSubDirs(Music2.path), waitTime)
+    dirs.size shouldBe 3
+    dirs should contain (Music2.path.getAbsolutePath)
+    dirs should contain (new File(Music2.path, "music21").getAbsolutePath)
+    dirs should contain (new File(Music2.path, "music22/music221").getAbsolutePath)
+  }
+
+  test("removeLibraryFolder removes only files under the parent folder"){
+    val lib = BufferLibrary()
+    val mfs: IndexedSeq[MediaFile] = Music2.mediaFiles
+    lib.contents ++= mfs
+    val removed = Await.result(lib.removeLibraryFolder(Music2.path.getPath +  "/music22"), waitTime)
+    removed shouldBe 1
+    lib.contents.find(_.path == Music2.path.getPath + "/music22/music221/song3.mp3") shouldBe None
+    lib.contents.size shouldBe 3
   }
 }

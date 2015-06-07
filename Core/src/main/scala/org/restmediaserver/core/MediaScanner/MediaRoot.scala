@@ -5,6 +5,7 @@ import java.io.File
 import com.typesafe.scalalogging.LazyLogging
 import org.restmediaserver.core.files.mediafiles.{AsyncMediaFileService, MediaFile}
 import org.restmediaserver.core.library.{LibraryFile, LibraryFolder, MediaLibrary}
+import scala.util.matching.Regex
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -30,15 +31,44 @@ class MediaRoot(private val path: File,
    * @return true if no errors occure during scan, otherwise false
    */
   def startScan(): Future[Int] = {
-    /** get list including this path and all subdirectories under this path */
-    def fetchDirectoryList(): Vector[File] = {
-      def helper(dir: File): Array[File] ={
-        val subDirs = dir.listFiles() filter (_.isDirectory)
-        val subDirsRecursive = (for(subDir <- subDirs) yield helper(subDir)).flatten
-        dir +: subDirsRecursive
+    def removeDirs(onDisk: IndexedSeq[File], inLib: Set[String]): Future[Int] = {
+      /** reduces paths to the top most paths that contain them */
+      def topLevelDirs(dirs: IndexedSeq[String]): IndexedSeq[String] = {
+        val sorted = dirs.sortBy(_.count(_ == File.separatorChar))
+        sorted.foldLeft(Vector[String]()) { (topLevel, dir) =>
+          topLevel.exists(tld => (new Regex(tld + File.separator + ".*")).pattern.matcher(dir).matches()) match {
+            case true => topLevel
+            case false => topLevel :+ dir
+          }
+        }
       }
-      helper(path).toVector
+      val existingSet = onDisk.map(_.getAbsolutePath) toSet
+      val toRemove = topLevelDirs(inLib diff existingSet toVector)
+      val fRemoved = toRemove map lib.removeLibraryFolder
+      val removed = Future.sequence(fRemoved)
+      removed map (_.sum)
     }
+
+    val dirs = Future(calcDirList())
+    val modded = dirs flatMap (d => updateDirs(d))
+    val libDirs = lib.getSubDirs(path)
+    val removed = libDirs flatMap { lds =>
+      dirs flatMap (ds => removeDirs(ds,lds))
+    }
+    Future.sequence(Seq(modded,removed)) map (_.sum)
+  }
+
+  /** get list including this path and all subdirectories under this path */
+  private def calcDirList(): Vector[File] = {
+    def helper(dir: File): Array[File] ={
+      val subDirs = dir.listFiles() filter (_.isDirectory)
+      val subDirsRecursive = (for(subDir <- subDirs) yield helper(subDir)).flatten
+      dir +: subDirsRecursive
+    }
+    helper(path).toVector
+  }
+
+  private def updateDirs(dirList: IndexedSeq[File]): Future[Int] = {
     /** get a list of Processables for the dir. These processables represent changes in the media files of dir which
       * match fileFilter and are different than what is in the library. This is non recursive and only inspects
       * immediate children of dir. Files which are filtered by fileFilter will be removed from the library if present */
@@ -76,7 +106,6 @@ class MediaRoot(private val path: File,
       } yield processables
     }
 
-    val dirList = fetchDirectoryList()
     val processablesPerChild = dirList map getProcessables
     val result = Future.sequence {
       processablesPerChild map { processableList =>

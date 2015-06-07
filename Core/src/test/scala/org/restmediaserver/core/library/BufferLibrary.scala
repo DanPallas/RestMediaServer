@@ -60,6 +60,26 @@ class BufferLibrary()(implicit ec: ExecutionContext) extends MediaLibrary with L
       }
     }
   }
+
+  override def getSubDirs(parent: File): Future[Set[String]] = {
+    val pred = MediaFile.isChild(parent.getAbsolutePath)
+    Future {
+      contents.synchronized{
+        contents filter pred map (_.parent) toSet
+      }
+    }
+  }
+
+  override def removeLibraryFolder(path: String): Future[Int] = {
+    val pred = MediaFile.isChild(path)
+    Future {
+      contents.synchronized{
+        val matching =  contents filter pred
+        contents --= matching
+        matching.size
+      }
+    }
+  }
 }
 object BufferLibrary {
   def apply()(implicit ec: ExecutionContext) = new BufferLibrary()

@@ -4,6 +4,8 @@ import java.io.File
 
 import org.restmediaserver.core.files.mediafiles.MediaFile.FileType.FileType
 
+import scala.util.matching.Regex
+
 /**
  * @author dan
  * @since version 1.0 on 3/19/15.
@@ -36,7 +38,7 @@ object MediaFile {
 
   /** get FileType from readable existing file
     * @return a FileType value or None if the file doesn't have a matching FileType */
-    def getFileType(path: File): Option[FileType] ={
+  def getFileType(path: File): Option[FileType] ={
     try{
       val fileName = path.getName
       val extensionStart = fileName lastIndexOf '.' match {
@@ -52,6 +54,14 @@ object MediaFile {
     }
   }
 
+  /** return a pred that returns true if the passed MediaFile is a child of the path parent
+    * @param parent path of parent directory. Should not have trailing '/'
+    * @return function which returns true iff MediaFile is a child of the path parent */
+  def isChild(parent: String): MediaFile => Boolean = {
+    val regex = parent + File.separator + ".*"
+    val pattern = new Regex(regex).pattern
+    (mf: MediaFile) => pattern.matcher(mf.path).matches()
+  }
 }
 
 
