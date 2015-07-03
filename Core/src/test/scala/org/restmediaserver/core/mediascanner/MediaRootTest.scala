@@ -79,5 +79,12 @@ class MediaRootTest extends fixture.FunSuite with BaseTestSettings {
     f.lib.putMediaFileCalls.size shouldBe 3
   }
 
+  test("scan removes files from the library if they no longer exist on the disk"){ f=>
+    val root = MediaRoot(Music1.path, f.lib, f.asmf)
+    f.lib.contents += Music1.song3DoesNotExist
+    Await.result(root.startScan(), waitTime)
+    f.lib.contents should not contain Music1.song3DoesNotExist
+  }
+
 
 }

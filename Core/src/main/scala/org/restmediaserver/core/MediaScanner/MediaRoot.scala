@@ -36,7 +36,7 @@ class MediaRoot(private val path: File,
       def topLevelDirs(dirs: IndexedSeq[String]): IndexedSeq[String] = {
         val sorted = dirs.sortBy(_.count(_ == File.separatorChar))
         sorted.foldLeft(Vector[String]()) { (topLevel, dir) =>
-          topLevel.exists(tld => (new Regex(tld + File.separator + ".*")).pattern.matcher(dir).matches()) match {
+          topLevel.exists(tld => new Regex(tld + File.separator + ".*").pattern.matcher(dir).matches()) match {
             case true => topLevel
             case false => topLevel :+ dir
           }
@@ -122,12 +122,12 @@ class MediaRoot(private val path: File,
     * found in these mediafiles will be reflected in the Library. This should be called before scanning to make sure
     * that changes that occur durring scanning are reflected in the library. The scan will continue unless there is an
     * exception and until stop is called. **/
-  def watch(): Unit = ???
+  def watch(): Unit = ??? //TODO watch
 
   /** stop watching folder
    * @return true if stopped without exception. Otherwise false.
    */
-  def stop(): Boolean = ???
+  def stop(): Boolean = ??? //TODO stop watching
 
 
   /** Objects of this trait can be processed. Processing will update the library by adding, removing, or updating the
