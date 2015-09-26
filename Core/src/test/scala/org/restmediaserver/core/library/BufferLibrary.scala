@@ -80,6 +80,13 @@ class BufferLibrary()(implicit ec: ExecutionContext) extends MediaLibrary with L
       }
     }
   }
+
+  override def getSongCount(): Future[Int] = ???
+
+  /** delete all contents in library */
+  override def deleteAll(): Unit = ???
+
+  override def close(): Unit = ???
 }
 object BufferLibrary {
   def apply()(implicit ec: ExecutionContext) = new BufferLibrary()

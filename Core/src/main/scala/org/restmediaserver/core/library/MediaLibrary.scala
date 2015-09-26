@@ -16,6 +16,19 @@ abstract class MediaLibrary {
   def putMediaFile(mediaFile: MediaFile): Future[Boolean]
   def getSubDirs(parent: File): Future[Set[String]]
   def removeLibraryFolder(path: String): Future[Int]
+  def getSongCount(): Future[Int]
+  def close(): Unit
+
+  /** delete all contents in library */
+  def deleteAll(): Unit
 }
 object MediaLibrary {
+}
+
+
+
+class DbException(msg: String) extends Exception(msg)
+object DbException{
+  def apply(msg: String): DbException = new DbException(msg)
+  def apply(msg: String, cause: Throwable): Throwable = new DbException(msg).initCause(cause)
 }
